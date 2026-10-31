@@ -6,39 +6,57 @@ import '../models/store_info.dart';
 /// FILE: affiliate_service.dart
 /// ----------------------------------------------------------------------------
 /// WHY IT IS MADE:
-/// Powers monetization across external store search URLs. When users tap
-/// a store card, this service seamlessly attaches publisher tracking tags
-/// (e.g. Amazon Associates Tag or universal aggregator networks like Cuelinks)
-/// so purchases within the 24-hour cookie window earn affiliate commissions.
+/// Powers developer monetization across external store search URLs. When users tap
+/// a store card, this service seamlessly attaches your publisher tracking tags
+/// (e.g. Cuelinks universal multi-store or Amazon Associates) so purchases
+/// within the 24-hour cookie window earn affiliate commissions for you.
 ///
-/// WHAT IT DOES:
-/// 1. Stores and persists affiliate publisher credentials locally.
-/// 2. Supports direct tags (Amazon Associates, Flipkart Affiliates).
-/// 3. Supports Universal Multi-Store Networks (Cuelinks, EarnKaro) covering
-///    Myntra, Ajio, Nykaa, Blinkit, Tata CLiQ, Croma, etc. with a single ID.
-/// 4. Converts standard search URLs into monetized tracking redirects.
-/// 5. Gracefully passes through raw URLs if no publisher credentials are set.
+/// NOTE ON SECURITY & ARCHITECTURE:
+/// Publisher IDs are baked directly into the app as developer defaults.
+/// End users cannot view, edit, or tamper with your publisher credentials.
 /// ============================================================================
 class AffiliateService {
+  /// ==========================================================================
+  /// DEVELOPER AFFILIATE CREDENTIALS (EMBEDDED FOR ALL APP USERS)
+  /// --------------------------------------------------------------------------
+  /// Paste your credentials here before building your production release.
+  /// All app installs will automatically credit affiliate commissions to you.
+  /// ==========================================================================
+  static const String defaultCuelinksPubId = ''; // e.g. '195432' from cuelinks.com
+  static const String defaultAmazonTag = '';    // e.g. 'yourtag-21' from affiliate-program.amazon.in
+  static const String defaultFlipkartId = '';   // e.g. 'youraffid' from affiliate.flipkart.com
+
   static const String _keyCuelinksId = 'affiliate_cuelinks_pub_id';
   static const String _keyAmazonTag = 'affiliate_amazon_tag';
   static const String _keyFlipkartId = 'affiliate_flipkart_id';
   static const String _keyEnabled = 'affiliate_enabled';
 
-  static String _cuelinksPubId = '';
-  static String _amazonTag = '';
-  static String _flipkartId = '';
+  static String _cuelinksPubId = defaultCuelinksPubId;
+  static String _amazonTag = defaultAmazonTag;
+  static String _flipkartId = defaultFlipkartId;
   static bool _isEnabled = true;
   static bool _isInitialized = false;
 
-  /// Loads persisted affiliate credentials from disk
+  /// Loads persisted affiliate credentials from disk with developer defaults
   static Future<void> initialize() async {
     if (_isInitialized) return;
     try {
       final prefs = await SharedPreferences.getInstance();
-      _cuelinksPubId = prefs.getString(_keyCuelinksId) ?? '';
-      _amazonTag = prefs.getString(_keyAmazonTag) ?? '';
-      _flipkartId = prefs.getString(_keyFlipkartId) ?? '';
+      final savedCuelinks = prefs.getString(_keyCuelinksId);
+      _cuelinksPubId = (savedCuelinks != null && savedCuelinks.isNotEmpty)
+          ? savedCuelinks
+          : defaultCuelinksPubId;
+
+      final savedAmazon = prefs.getString(_keyAmazonTag);
+      _amazonTag = (savedAmazon != null && savedAmazon.isNotEmpty)
+          ? savedAmazon
+          : defaultAmazonTag;
+
+      final savedFlipkart = prefs.getString(_keyFlipkartId);
+      _flipkartId = (savedFlipkart != null && savedFlipkart.isNotEmpty)
+          ? savedFlipkart
+          : defaultFlipkartId;
+
       _isEnabled = prefs.getBool(_keyEnabled) ?? true;
       _isInitialized = true;
     } catch (e) {

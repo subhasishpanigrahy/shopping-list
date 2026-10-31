@@ -8,7 +8,6 @@ import '../theme/app_theme.dart';
 import '../widgets/add_custom_store_sheet.dart';
 import '../widgets/add_item_bar.dart';
 import '../widgets/affiliate_disclosure_dialog.dart';
-import '../widgets/affiliate_settings_dialog.dart';
 import '../widgets/shopping_item_tile.dart';
 
 /// ============================================================================
@@ -307,8 +306,6 @@ class HomeScreen extends StatelessWidget {
                 AddCustomStoreSheet.show(context);
               } else if (val == 'about') {
                 _showCatalogDialog(context);
-              } else if (val == 'affiliate_config') {
-                AffiliateSettingsDialog.show(context);
               } else if (val == 'transparency') {
                 AffiliateDisclosureDialog.show(context);
               }
@@ -343,16 +340,6 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(width: 10),
                     Text('Stores Directory (${StoreCatalog.allStores.length + provider.customStores.length})',
                         style: const TextStyle(fontSize: 13.5)),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'affiliate_config',
-                child: Row(
-                  children: [
-                    Icon(Icons.monetization_on_rounded, color: AppTheme.accentAmber, size: 18),
-                    SizedBox(width: 10),
-                    Text('Affiliate Monetization Config', style: TextStyle(fontSize: 13.5)),
                   ],
                 ),
               ),
