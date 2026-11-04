@@ -4,10 +4,13 @@ import '../data/store_catalog.dart';
 import '../models/product_category.dart';
 import '../providers/shopping_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/ad_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/ad_banner_widget.dart';
 import '../widgets/add_custom_store_sheet.dart';
 import '../widgets/add_item_bar.dart';
 import '../widgets/affiliate_disclosure_dialog.dart';
+import '../widgets/native_ad_card.dart';
 import '../widgets/shopping_item_tile.dart';
 
 /// ============================================================================
@@ -299,7 +302,9 @@ class HomeScreen extends StatelessWidget {
             ),
             onSelected: (val) {
               if (val == 'clear_completed') {
-                provider.clearCompleted();
+                AdService.showInterstitialAd(
+                  onDismissed: () => provider.clearCompleted(),
+                );
               } else if (val == 'clear_all') {
                 _confirmClearAll(context, provider);
               } else if (val == 'add_store') {
@@ -392,9 +397,20 @@ class HomeScreen extends StatelessWidget {
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
-                          itemCount: provider.filteredItems.length,
+                          itemCount: provider.filteredItems.length +
+                              (provider.filteredItems.length >= 3 ? 1 : 0),
                           itemBuilder: (ctx, index) {
-                            final item = provider.filteredItems[index];
+                            // Render blended sponsored deal card after 3rd checklist item
+                            if (index == 3 &&
+                                provider.filteredItems.length >= 3) {
+                              return const NativeDealAdCard();
+                            }
+                            final itemIndex =
+                                (provider.filteredItems.length >= 3 &&
+                                        index > 3)
+                                    ? index - 1
+                                    : index;
+                            final item = provider.filteredItems[itemIndex];
                             return ShoppingItemTile(item: item);
                           },
                         ),
@@ -402,6 +418,9 @@ class HomeScreen extends StatelessWidget {
 
             // Bottom Add Item Bar
             const AddItemBar(),
+
+            // Anchored Adaptive Bottom Banner Ad
+            const AdBannerWidget(),
           ],
         ),
       ),
@@ -786,6 +805,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               provider.clearAll();
               Navigator.pop(ctx);
+              AdService.showInterstitialAd();
             },
             child: const Text('Clear All', style: TextStyle(fontWeight: FontWeight.w700)),
           ),

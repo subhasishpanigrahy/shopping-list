@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'providers/shopping_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/home_screen.dart';
+import 'services/ad_service.dart';
 import 'services/affiliate_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/responsive_mobile_frame.dart';
@@ -34,6 +35,7 @@ import 'widgets/responsive_mobile_frame.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AffiliateService.initialize();
+  await AdService.initialize();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
